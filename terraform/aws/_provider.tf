@@ -1,4 +1,14 @@
 terraform {
+  required_version = ">= 1.12.0"
+
+  backend "remote" {
+    organization = "eland"
+
+    workspaces {
+      name = "rancher"
+    }
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -13,9 +23,8 @@ terraform {
       version = "4.0.4"
     }
   }
-  required_version = ">= 1.0.0"
 }
 
 provider "aws" {
-  region     = var.aws_region
+  region = var.aws_region
 }
