@@ -90,10 +90,6 @@ resource "aws_security_group" "rancher_sg_allowall" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = {
-    Creator = "rancher-quickstart"
-  }
 }
 
 # AWS EC2 instance for creating a single node RKE cluster and installing the Rancher server
@@ -103,7 +99,7 @@ resource "aws_instance" "rancher_server" {
   depends_on = [
     aws_route_table_association.rancher_route_table_association
   ]
-  ami           = data.aws_ami.sles.id
+  ami           = data.aws_ami.ubuntu.id
   instance_type = var.server_instance_type
 
   key_name                    = aws_key_pair.quickstart_key_pair.key_name
@@ -113,6 +109,7 @@ resource "aws_instance" "rancher_server" {
 
   root_block_device {
     volume_size = 40
+    volume_type = "gp3"
     #encrypted   = true
   }
 
@@ -132,8 +129,7 @@ resource "aws_instance" "rancher_server" {
   }
 
   tags = {
-    Name    = "${var.prefix}-rancher-server"
-    Creator = "rancher-quickstart"
+    Name = "${var.prefix}-rancher-server"
   }
 }
 
@@ -156,5 +152,5 @@ module "rancher_common" {
   admin_password = var.rancher_server_admin_password
 
   workload_kubernetes_version = var.workload_kubernetes_version
-  workload_cluster_name       = "quickstart-aws-custom"
+  workload_cluster_name       = "test-custom"
 }

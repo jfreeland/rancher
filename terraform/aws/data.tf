@@ -1,16 +1,10 @@
-# Data for AWS module
-
-# AWS data
-# ----------------------------------------------------------
-
-# Use latest SLES 15 SP3
-data "aws_ami" "sles" {
+data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["013907871322"] # SUSE
+  owners      = ["099720109477"] # SUSE
 
   filter {
     name   = "name"
-    values = ["suse-sles-15-sp3*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20241206"]
   }
 
   filter {
@@ -27,4 +21,8 @@ data "aws_ami" "sles" {
     name   = "root-device-type"
     values = ["ebs"]
   }
+}
+
+data "aws_route53_zone" "selected" {
+  name = "ratings.cloud."
 }
