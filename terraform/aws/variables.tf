@@ -20,10 +20,16 @@ variable "prefix" {
   default     = "quickstart"
 }
 
+variable "server_instance_type" {
+  type        = string
+  description = "Instance type used for server EC2 instance"
+  default     = "t3a.large"
+}
+
 variable "instance_type" {
   type        = string
-  description = "Instance type used for all EC2 instances"
-  default     = "t3a.medium"
+  description = "Instance type used for worker EC2 instances"
+  default     = "t3a.large"
 }
 
 variable "rancher_kubernetes_version" {

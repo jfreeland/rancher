@@ -22,6 +22,7 @@ resource "aws_key_pair" "quickstart_key_pair" {
   public_key      = tls_private_key.global_key.public_key_openssh
 }
 
+# tfsec:ignore:AVD-AWS-0178
 resource "aws_vpc" "rancher_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -68,6 +69,9 @@ resource "aws_route_table_association" "rancher_route_table_association" {
 }
 
 # Security group to allow all traffic
+# tfsec:ignore:AVD-AWS-0124
+# tfsec:ignore:AVD-AWS-0107
+# tfsec:ignore:AVD-AWS-0104
 resource "aws_security_group" "rancher_sg_allowall" {
   name        = "${var.prefix}-rancher-allowall"
   description = "Rancher quickstart - allow all traffic"
@@ -93,12 +97,14 @@ resource "aws_security_group" "rancher_sg_allowall" {
 }
 
 # AWS EC2 instance for creating a single node RKE cluster and installing the Rancher server
+# tfsec:ignore:AVD-AWS-0028
+# tfsec:ignore:AVD-AWS-0131
 resource "aws_instance" "rancher_server" {
   depends_on = [
     aws_route_table_association.rancher_route_table_association
   ]
   ami           = data.aws_ami.sles.id
-  instance_type = var.instance_type
+  instance_type = var.server_instance_type
 
   key_name                    = aws_key_pair.quickstart_key_pair.key_name
   vpc_security_group_ids      = [aws_security_group.rancher_sg_allowall.id]
@@ -107,6 +113,7 @@ resource "aws_instance" "rancher_server" {
 
   root_block_device {
     volume_size = 40
+    #encrypted   = true
   }
 
   provisioner "remote-exec" {

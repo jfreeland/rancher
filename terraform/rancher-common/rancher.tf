@@ -8,8 +8,9 @@ resource "rancher2_bootstrap" "admin" {
 
   provider = rancher2.bootstrap
 
-  password  = var.admin_password
-  telemetry = true
+  password = var.admin_password
+  # NOTE: this was removed
+  #telemetry = true
 }
 
 # Create custom managed cluster for quickstart
