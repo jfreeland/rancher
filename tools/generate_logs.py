@@ -10,6 +10,8 @@ from elasticsearch import Elasticsearch
 from faker import Faker
 from hurry.filesize import size
 
+SECONDS_BETWEEN_LOGS = 15
+
 
 def load_bytes():
     try:
@@ -34,9 +36,14 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+elastic_pw = os.getenv("ELASTIC_PW")
+if not elastic_pw:
+    print("Please set the ELASTIC_PW environment variable.")
+    sys.exit(1)
+
 port = 443
 host = "elastic.ratings.cloud"
-auth = ("elastic", os.getenv("ELASTIC_PW"))
+auth = ("elastic", elastic_pw)
 if args.env == "dc1":
     index_name = "k8s-dc1"
 elif args.env == "dc2":
@@ -47,7 +54,7 @@ else:
 
 client = Elasticsearch(
     hosts=[f"https://{host}:{port}"],
-    basic_auth=str(auth),
+    basic_auth=auth,
     verify_certs=True,
 )
 
@@ -73,7 +80,7 @@ for i in range(num_logs):
         f"indexed log entry: {i}, payload size: {size(payload_size)}, total bytes: {size(total_bytes)}"
     )
     save_bytes(total_bytes)
-    time.sleep(60)
+    time.sleep(SECONDS_BETWEEN_LOGS)
 
 print("wow this ran to the end")
 print(f"Successfully indexed {num_logs} log entries to {index_name}.")

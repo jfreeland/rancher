@@ -2,7 +2,7 @@
 # tfsec:ignore:AVD-AWS-0028
 # tfsec:ignore:AVD-AWS-0131
 resource "aws_instance" "worker" {
-  count = 2
+  count = 3
 
   depends_on = [
     aws_route_table_association.rancher_route_table_association
@@ -18,6 +18,10 @@ resource "aws_instance" "worker" {
 
   instance_market_options {
     market_type = "spot"
+    spot_options {
+      instance_interruption_behavior = "stop"
+      spot_instance_type             = "persistent"
+    }
   }
 
   root_block_device {

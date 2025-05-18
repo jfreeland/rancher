@@ -3,3 +3,4 @@ terraform.tfstate*
 kube_config_*
 id_rsa*
 venv
+tools/*bytes

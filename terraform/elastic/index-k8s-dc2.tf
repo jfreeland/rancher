@@ -14,9 +14,6 @@ resource "elasticstack_elasticsearch_index_lifecycle" "k8s_dc2" {
 
   delete {
     min_age = "3h"
-    wait_for_snapshot {
-      policy = elasticstack_elasticsearch_snapshot_lifecycle.k8s_dc2.name
-    }
     delete {}
   }
 }
@@ -27,7 +24,6 @@ resource "elasticstack_elasticsearch_index_template" "k8s_dc2" {
   index_patterns = ["k8s-dc2*"]
 
   template {
-    # TODO: I'm not sure why I need this but it's required for snapshots to work???
     alias {
       name = "k8s-dc2-log"
     }
