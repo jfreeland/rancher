@@ -4,6 +4,7 @@ resource "elasticstack_elasticsearch_cluster_settings" "cluster_settings" {
     setting {
       name  = "cluster.routing.allocation.enable"
       value = "all"
+      #value = "primaries"
     }
     setting {
       name  = "cluster.routing.allocation.same_shard.host"
@@ -15,7 +16,7 @@ resource "elasticstack_elasticsearch_cluster_settings" "cluster_settings" {
     }
     setting {
       name       = "cluster.routing.allocation.include.zone"
-      value_list = ["dc1", "dc2"]
+      value_list = ["dc1", "dc2", "aws"]
     }
     #setting {
     #  name       = "cluster.routing.allocation.awareness.force.zone.values"

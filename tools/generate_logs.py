@@ -6,11 +6,14 @@ import random
 import sys
 import time
 
-from elasticsearch import Elasticsearch
+from elasticsearch import (ConnectionError, ConnectionTimeout, Elasticsearch,
+                           RequestError)
 from faker import Faker
 from hurry.filesize import size
+from tenacity import (retry, retry_if_exception_type, stop_after_attempt,
+                      wait_exponential)
 
-SECONDS_BETWEEN_LOGS = 15
+SECONDS_BETWEEN_LOGS = 10
 
 
 def load_bytes():
@@ -63,6 +66,19 @@ num_logs = 100000000
 
 total_bytes = load_bytes()
 
+
+@retry(
+    stop=stop_after_attempt(9),
+    wait=wait_exponential(multiplier=2, min=1, max=10),
+    retry=retry_if_exception_type((ConnectionError, RequestError, ConnectionTimeout)),
+    before_sleep=lambda retry_state: print(
+        f"Retrying index operation: attempt {retry_state.attempt_number}"
+    ),
+)
+def index_log_entry(client, index_name, log_entry):
+    return client.index(index=index_name, body=log_entry)
+
+
 for i in range(num_logs):
     log_entry = {
         "@timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -75,11 +91,16 @@ for i in range(num_logs):
     payload_size = len(log_entry_json.encode("utf-8"))
     total_bytes += payload_size
 
-    client.index(index=index_name, body=log_entry)
-    print(
-        f"indexed log entry: {i}, payload size: {size(payload_size)}, total bytes: {size(total_bytes)}"
-    )
-    save_bytes(total_bytes)
+    try:
+        index_log_entry(client, index_name, log_entry)
+        print(
+            f"indexed log entry: {i}, payload size: {size(payload_size)}, total bytes: {size(total_bytes)}"
+        )
+        save_bytes(total_bytes)
+    except Exception as e:
+        print(f"Failed to index log entry {i} after retries: {str(e)}")
+        break
+
     time.sleep(SECONDS_BETWEEN_LOGS)
 
 print("wow this ran to the end")

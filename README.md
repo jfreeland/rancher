@@ -14,6 +14,7 @@ flux bootstrap github --owner=jfreeland --repository=flux --branch=main --path=.
 # elastic
 curl -u "elastic:$ELASTIC_PW" "https://elastic.ratings.cloud/_things?pretty"
 curl -u "elastic:$ELASTIC_PW" "https://elastic.ratings.cloud/_cluster/allocation/explain?pretty" -H "Content-Type: application/json" -d @explain.json | fx
+curl -u "elastic:$ELASTIC_PW" "https://elastic.ratings.cloud/_cluster/reroute?pretty" -X POST -H "Content-Type: application/json" -d @reroute.json
 # do things
 for i in $(terraform state list | grep helm); do terraform state rm $i; done
 terraform destroy -auto-approve
