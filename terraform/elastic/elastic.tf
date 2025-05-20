@@ -14,8 +14,12 @@ resource "elasticstack_elasticsearch_cluster_settings" "cluster_settings" {
       value = "zone"
     }
     setting {
-      name       = "cluster.routing.allocation.awareness.force.zone.values"
+      name       = "cluster.routing.allocation.include.zone"
       value_list = ["dc1", "dc2"]
     }
+    #setting {
+    #  name       = "cluster.routing.allocation.awareness.force.zone.values"
+    #  value_list = ["dc1", "dc2"]
+    #}
   }
 }

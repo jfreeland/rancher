@@ -33,6 +33,13 @@ resource "elasticstack_elasticsearch_index_template" "k8s_dc1" {
         number_of_shards   = 1
         number_of_replicas = 1
       }
+      routing = {
+        allocation = {
+          include = {
+            zone = "dc1"
+          }
+        }
+      }
       "lifecycle.name" = elasticstack_elasticsearch_index_lifecycle.k8s_dc1.name
     })
 
